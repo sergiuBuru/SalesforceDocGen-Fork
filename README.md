@@ -12,14 +12,14 @@ Normally, document generation in Salesforce is expensive. We believe that basic 
 
 ## 🚀 Quick Install (2GP Unlocked Package)
 
-You can install the latest stable version (0.1.0-3) of the platform using the following command:
+You can install the latest stable version (0.1.0-4) of the platform using the following command:
 
 ```bash
-sf package install --package 04tdL000000NoXBQA0 --wait 10 --installation-key-bypass
+sf package install --package 04tdL000000Nos9QAC --wait 10 --installation-key-bypass
 ```
 
-**Subscriber Package Version ID**: `04tdL000000NoXBQA0`  
-**Installation URL**: [Click here to install](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tdL000000NoXBQA0)
+**Subscriber Package Version ID**: `04tdL000000Nos9QAC`  
+**Installation URL**: [Click here to install](https://login.salesforce.com/packaging/installPackage.apexp?p0=04tdL000000Nos9QAC)
 
 ---
 
@@ -58,6 +58,11 @@ Need to generate documents for hundreds of records at once?
 - **Developer Name**: `Generate Bulk Documents`
 - **Class**: `DocGenBulkFlowAction`
 - **Usage**: Ideal for **Scheduled Flows**. Pass a Template ID and an optional SOQL condition to trigger a batch job that generates documents for all matching records in the background.
+
+### 6. Zero-Config Background PDF Engine
+- **Architecture**: The package features a self-contained, async PDF rendering engine.
+- **Dynamic Loopback**: Uses native Salesforce Connect APIs via `Url.getOrgDomainUrl()`. No Named Credentials or Remote Site Settings required!
+- **Resilience**: Built-in 3x retry mechanism gracefully handles `202 Accepted` latency from Salesforce servers.
 
 ---
 
