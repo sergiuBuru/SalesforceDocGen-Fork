@@ -84,8 +84,10 @@ Need to generate documents for hundreds of records at once?
 2. **Create a Site**: Create a new Experience Cloud site (Help Center or Build Your Own is recommended).
 3. **Configure Settings**: Navigate to the **DocGen Setup** tab in the DocGen app and complete the 4-step wizard. This configures the secure loopback and saves your Site URL.
 4. **Embed Flow**: In **Experience Builder**, create a new public page and drag the **Flow** component onto it. Select the **DocGen Signature Submission** flow.
-5. **Pass Parameters**: Ensure the "Pass URL parameter values into flow variables" checkbox is checked in the Flow component properties.
-6. **Publish**: Publish your site. Signature links generated from record pages will now point to this secure portal.
+5. **Pass Parameters**: In the Flow component properties, look for the **secureToken** input variable. Enter `{!token}` into the value field to pull the token from the URL. Ensure the "Pass URL parameter values into flow variables" checkbox is checked.
+6. **Guest Permissions**: Go to **Site Settings > Guest User Profile**. Under **Enabled Flow Access**, add the **DocGen Signature Submission** flow.
+7. **Guest Access**: Ensure the site has "Public can access the site" enabled in the General settings of the Experience Builder.
+8. **Publish**: Publish your site. Signature links generated from record pages will now point to this secure portal.
 
 ---
 
