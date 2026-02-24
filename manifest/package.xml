@@ -20,10 +20,15 @@
         <members>DocGenSetupController</members>
         <members>DocGenSignatureController</members>
         <members>DocGenSignatureSenderController</members>
+        <members>DocGenSignatureFinalizer</members>
         <members>DocGenSignatureService</members>
         <members>DocGenSignatureSubmitter</members>
         <members>DocGenSignatureValidator</members>
         <name>ApexClass</name>
+    </types>
+    <types>
+        <members>DocGen_Loopback_Auth</members>
+        <name>ExternalCredential</name>
     </types>
     <types>
         <members>DocGenRenditionTrigger</members>
