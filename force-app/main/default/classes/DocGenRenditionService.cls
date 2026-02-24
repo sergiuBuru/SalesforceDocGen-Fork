@@ -15,18 +15,33 @@ public with sharing class DocGenRenditionService {
      * Enqueues a background job for all collected renditions.
      */
     public static void enqueueRenditions() {
+        enqueueRenditions(false);
+    }
+
+    /**
+     * Enqueues a background job for all collected renditions.
+     * If direct is true, bypasses the Platform Event bus and enqueues the Queueable directly.
+     * This preserves the current user's authentication context.
+     */
+    public static void enqueueRenditions(Boolean direct) {
         if (pendingRenditions.isEmpty()) return;
         
-        List<DocGen_Rendition_Event__e> events = new List<DocGen_Rendition_Event__e>();
-        for (Id cvId : pendingRenditions.keySet()) {
-            events.add(new DocGen_Rendition_Event__e(
-                Source_CV_Id__c = (String)cvId,
-                Related_Record_Id__c = (String)pendingRenditions.get(cvId)
-            ));
-        }
-        
-        if (!events.isEmpty()) {
-            EventBus.publish(events);
+        if (direct) {
+            System.debug('DocGen: Directing renditions to Queueable (User Context: ' + UserInfo.getUserName() + ')');
+            if (!Test.isRunningTest()) {
+                System.enqueueJob(new DocGenRenditionQueueable(new Map<Id, Id>(pendingRenditions)));
+            }
+        } else {
+            List<DocGen_Rendition_Event__e> events = new List<DocGen_Rendition_Event__e>();
+            for (Id cvId : pendingRenditions.keySet()) {
+                events.add(new DocGen_Rendition_Event__e(
+                    Source_CV_Id__c = (String)cvId,
+                    Related_Record_Id__c = (String)pendingRenditions.get(cvId)
+                ));
+            }
+            if (!events.isEmpty()) {
+                EventBus.publish(events);
+            }
         }
         pendingRenditions.clear();
     }

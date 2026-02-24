@@ -52,7 +52,8 @@ global with sharing class DocGenBatch implements Database.Batchable<SObject>, Da
         );
 
         // EXPERIMENT: Flush collected PDF rendition jobs (one per batch execute)
-        DocGenRenditionService.enqueueRenditions();
+        // Direct enqueuing is used to preserve the user's auth context for loopback callouts
+        DocGenRenditionService.enqueueRenditions(true);
     }
     
     global void finish(Database.BatchableContext BC) {

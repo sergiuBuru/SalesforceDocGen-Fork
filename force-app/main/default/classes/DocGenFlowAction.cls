@@ -34,7 +34,8 @@ global with sharing class DocGenFlowAction {
         }
         
         // EXPERIMENT: Flush collected PDF rendition jobs
-        DocGenRenditionService.enqueueRenditions();
+        // Direct enqueuing is used to preserve the user's auth context for loopback callouts
+        DocGenRenditionService.enqueueRenditions(true);
 
         return responses;
     }
