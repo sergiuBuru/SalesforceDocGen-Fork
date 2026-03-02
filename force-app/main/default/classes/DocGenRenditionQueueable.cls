@@ -13,11 +13,16 @@ public with sharing class DocGenRenditionQueueable implements Queueable, Databas
     }
     
     public void execute(QueueableContext context) {
+        // Attach a Finalizer for retries — re-enqueuing from a Finalizer does NOT
+        // increment the queueable chain depth, avoiding the 5-level limit.
+        DocGenRenditionFinalizer fin = new DocGenRenditionFinalizer(retryCount);
+        System.attachFinalizer(fin);
+
         Map<Id, Id> failedCvs = new Map<Id, Id>();
         List<ContentVersion> pdfsToInsert = new List<ContentVersion>();
         Map<Integer, Id> indexToRecordId = new Map<Integer, Id>();
         List<Id> successSourceIds = new List<Id>();
-        
+
         Integer index = 0;
         for (Id cvId : cvIdToRecordId.keySet()) {
             try {
@@ -48,13 +53,13 @@ public with sharing class DocGenRenditionQueueable implements Queueable, Databas
                 insert cvDecision.getRecords();
                 pdfsToInsert = (List<ContentVersion>) cvDecision.getRecords();
                 System.debug('DocGen: Inserted ' + pdfsToInsert.size() + ' PDFs.');
-                
+
                 // --- DIRECT LINKAGE ---
                 List<ContentDocumentLink> cdlsToInsert = new List<ContentDocumentLink>();
-                
+
                 Set<Id> pdfCvIds = new Set<Id>();
                 for(ContentVersion cv : pdfsToInsert) pdfCvIds.add(cv.Id);
-                
+
                 Map<Id, Id> cvIdToDocId = new Map<Id, Id>();
                 for(ContentVersion cv : [SELECT Id, ContentDocumentId FROM ContentVersion WHERE Id IN :pdfCvIds WITH SYSTEM_MODE]) {
                     cvIdToDocId.put(cv.Id, cv.ContentDocumentId);
@@ -63,7 +68,7 @@ public with sharing class DocGenRenditionQueueable implements Queueable, Databas
                 for(Integer i=0; i < pdfsToInsert.size(); i++) {
                     Id recordId = indexToRecordId.get(i);
                     Id docId = cvIdToDocId.get(pdfsToInsert[i].Id);
-                    
+
                     if (recordId != null && docId != null) {
                         cdlsToInsert.add(new ContentDocumentLink(
                             ContentDocumentId = docId,
@@ -73,7 +78,7 @@ public with sharing class DocGenRenditionQueueable implements Queueable, Databas
                         ));
                     }
                 }
-                
+
                 if (!cdlsToInsert.isEmpty()) {
                     SObjectAccessDecision cdlDecision = Security.stripInaccessible(AccessType.CREATABLE, cdlsToInsert);
                     Database.insert(cdlDecision.getRecords(), false);
@@ -84,19 +89,15 @@ public with sharing class DocGenRenditionQueueable implements Queueable, Databas
 
                 // CLEANUP: Delete the source DOCX
                 cleanupSourceFiles(successSourceIds);
-                
+
             } catch (Exception e) {
                 System.debug('DocGen: Finalization error: ' + e.getMessage());
                 for(Id sid : successSourceIds) failedCvs.put(sid, cvIdToRecordId.get(sid));
             }
         }
 
-        // Handle retries
-        if (!failedCvs.isEmpty() && retryCount < 10) {
-            if (!Test.isRunningTest()) {
-                System.enqueueJob(new DocGenRenditionQueueable(failedCvs, retryCount + 1));
-            }
-        }
+        // Pass failures to the Finalizer for retry (avoids chain depth limit)
+        fin.failedCvs = failedCvs;
     }
 
     private void updateAuditHashes(List<Id> sourceCvIds, List<ContentVersion> pdfCvs) {

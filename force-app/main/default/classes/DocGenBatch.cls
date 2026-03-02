@@ -7,6 +7,7 @@ public with sharing class DocGenBatch implements Database.Batchable<SObject>, Da
     
     public Integer successCount = 0;
     public Integer failCount = 0;
+    public Map<String, String> collectedRenditions = new Map<String, String>();
     
     public DocGenBatch(Id jobId) {
         this.jobId = jobId;
@@ -77,17 +78,20 @@ public with sharing class DocGenBatch implements Database.Batchable<SObject>, Da
                 System.debug('DocGen Batch Error for ' + rec.Id + ': ' + e.getMessage());
             }
         }
-        
+
+        // Drain any PDF renditions registered during this execute and accumulate
+        // in the Stateful instance variable for a single enqueue in finish()
+        Map<Id, Id> drained = DocGenRenditionService.drainPendingRenditions();
+        for (Id cvId : drained.keySet()) {
+            collectedRenditions.put(String.valueOf(cvId), String.valueOf(drained.get(cvId)));
+        }
+
         // Update Job record incrementally for real-time progress tracking
         update new DocGen_Job__c(
             Id = jobId,
             Success_Count__c = successCount,
             Error_Count__c = failCount
         );
-
-        // Flush collected PDF rendition jobs (one per batch execute)
-        // Direct enqueuing preserves the user's auth context for loopback callouts
-        DocGenRenditionService.enqueueRenditions(true);
     }
     
     public void finish(Database.BatchableContext BC) {
@@ -107,5 +111,14 @@ public with sharing class DocGenBatch implements Database.Batchable<SObject>, Da
             Error_Count__c = failCount
         );
         update jobToUpdate;
+
+        // Enqueue a single rendition job for ALL collected PDF renditions
+        if (!collectedRenditions.isEmpty() && !Test.isRunningTest()) {
+            Map<Id, Id> renditionMap = new Map<Id, Id>();
+            for (String cvId : collectedRenditions.keySet()) {
+                renditionMap.put((Id)cvId, (Id)collectedRenditions.get(cvId));
+            }
+            System.enqueueJob(new DocGenRenditionQueueable(renditionMap));
+        }
     }
 }

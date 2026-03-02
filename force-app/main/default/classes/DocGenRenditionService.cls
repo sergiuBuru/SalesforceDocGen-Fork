@@ -12,6 +12,16 @@ public with sharing class DocGenRenditionService {
     }
 
     /**
+     * Returns and clears all pending renditions without enqueuing.
+     * Used by DocGenBatch to accumulate renditions across Stateful execute() invocations.
+     */
+    public static Map<Id, Id> drainPendingRenditions() {
+        Map<Id, Id> drained = new Map<Id, Id>(pendingRenditions);
+        pendingRenditions.clear();
+        return drained;
+    }
+
+    /**
      * Enqueues a background job for all collected renditions.
      */
     public static void enqueueRenditions() {
