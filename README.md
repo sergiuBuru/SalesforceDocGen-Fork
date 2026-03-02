@@ -139,6 +139,7 @@ Tags are placed directly in your `.docx` or `.pptx` template files:
 | `{Parent.Field}` | Parent record lookup | `{Account.Name}`, `{Owner.Email}` |
 | `{#ChildList}...{/ChildList}` | Loop over child records | `{#Contacts}{FirstName} {LastName}{/Contacts}` |
 | `{#BooleanField}...{/BooleanField}` | Conditional section | `{#IsActive}Active{/IsActive}` |
+| `{FieldName:format}` | Date/DateTime with format | `{CloseDate:MM/dd/yyyy}`, `{CreatedDate:MMMM d, yyyy}` |
 | `{%ImageField}` | Image injection (default size) | `{%Company_Logo__c}` |
 | `{%ImageField:WxH}` | Image with pixel dimensions | `{%Photo__c:400x300}` |
 | `{#Signature}` | Single-signer signature placeholder | |
