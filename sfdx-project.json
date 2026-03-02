@@ -1,12 +1,12 @@
 {
   "packageDirectories": [
     {
-      "versionName": "v0.5.0 - Multi-Signer Signatures & Rich Text",
-      "versionNumber": "0.5.0.NEXT",
+      "versionName": "v0.6.0 - Security Hardening",
+      "versionNumber": "0.6.0.NEXT",
       "path": "force-app",
       "default": true,
       "package": "Document Generation",
-      "versionDescription": "Multi-signer signature roles, VF-based signing portal, rich text support, image size controls, async PDF engine fixes, and SLDS mobile accessibility improvements."
+      "versionDescription": "Security hardening for AppExchange readiness: CRUD/FLS enforcement, SOQL injection hardening, postMessage origin validation, error message sanitization, HTTPS enforcement, and removal of unused dependencies."
     }
   ],
   "name": "Document Generation",
@@ -24,6 +24,7 @@
     "Document Generation@0.1.0-7": "04tdL000000Ny3VQAS",
     "Document Generation@0.5.0-1": "04tdL000000OjlZQAS",
     "Document Generation@0.5.0-2": "04tdL000000OjnBQAS",
-    "Document Generation@0.5.0-3": "04tdL000000Ooi1QAC"
+    "Document Generation@0.5.0-3": "04tdL000000Ooi1QAC",
+    "Document Generation@0.6.0-1": "04tdL000000Ooq5QAC"
   }
 }
