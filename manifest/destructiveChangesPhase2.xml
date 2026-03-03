@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Run this AFTER removing references in the org (see README-DESTRUCTIVE.md or instructions below). -->
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>DocGenSignatureFinalizer</members>
+        <members>DocGenSignatureValidator</members>
+        <name>ApexClass</name>
+    </types>
+    <types>
+        <members>DocGenSign</members>
+        <members>DocGenVerify</members>
+        <name>ApexPage</name>
+    </types>
+    <types>
+        <members>DocGen_Auth_Provider</members>
+        <name>AuthProvider</name>
+    </types>
+    <types>
+        <members>DocGen_Signature_Submission</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>docGenAuthenticator</members>
+        <members>docGenSignaturePad</members>
+        <name>LightningComponentBundle</name>
+    </types>
+    <version>66.0</version>
+</Package>

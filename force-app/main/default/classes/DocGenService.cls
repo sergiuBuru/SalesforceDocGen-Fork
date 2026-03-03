@@ -291,12 +291,8 @@ public with sharing class DocGenService {
         cv.FirstPublishLocationId = recordId; 
         insert cv;
 
-        // EXPERIMENT: Background PDF Rendition Hack
-        // If the requested format is PDF, add to the collector for delayed background capture
-        if (format == 'PDF') {
-            System.debug('DocGen: Collecting Rendition Capture for ' + cv.Id);
-            DocGenRenditionService.addPendingRendition(cv.Id, recordId);
-        }
+        // Note: PDF output for interactive scenarios is handled client-side via DocGenPDFEngine,
+        // so this server-side path always stores the native DOCX/PPTX file only.
         return [SELECT ContentDocumentId FROM ContentVersion WHERE Id = :cv.Id WITH USER_MODE].ContentDocumentId;
     }
     private static String generateDocTitle(String format, Map<String, Object> data) {
