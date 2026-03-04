@@ -360,6 +360,7 @@ const VERSION_COLUMNS = [
             this.editTemplateOutputFormat = row.Output_Format__c || 'Native';
             this.editTemplateDesc = row.Description__c;
             this.editTemplateQuery = row.Query_Config__c;
+
             this.editTemplateTestRecordId = row.Test_Record_Id__c; 
             this.editTemplateTitleFormat = row.Document_Title_Format__c; 
             

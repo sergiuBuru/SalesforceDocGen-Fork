@@ -24,7 +24,10 @@ export default class DocGenQueryBuilder extends LightningElement {
     @track selectedFields = [];
     
     // Child Configs
-    @track childConfigs = []; 
+    @track childConfigs = [];
+
+    // Suppress configchange while restoring from saved config so parent is not overwritten with partial query
+    _isParsingConfig = false; 
     
     // Search & UI State
     @track showObjectDropdown = false;
@@ -271,6 +274,8 @@ export default class DocGenQueryBuilder extends LightningElement {
     
     parseConfig(queryStr) {
         if (!queryStr) return;
+
+        this._isParsingConfig = true;
         
         // 1. Extract Subqueries (Nested Parentheses Handling is tricky with Regex, assuming standard SOQL)
         // Match: (SELECT ... FROM ...)
@@ -363,13 +368,19 @@ export default class DocGenQueryBuilder extends LightningElement {
             this.filterFields();
         }
             
-        // 3. Child Configs
-        if (this.childOptions.length === 0) return; 
+        // 3. Child Configs — if not loaded yet, do not notify parent (keeps full query); re-parse when wire delivers
+        if (this.childOptions.length === 0) {
+            this._isParsingConfig = false;
+            return;
+        }
         
         this.rebuildChildConfigs(subqueries);
         
         // Force tags refresh
         this.selectedFields = [...this.selectedFields];
+
+        this._isParsingConfig = false;
+        this.notifyChange();
     }
     
     rebuildChildConfigs(subqueries) {
@@ -1075,6 +1086,8 @@ export default class DocGenQueryBuilder extends LightningElement {
 
 
     notifyChange() {
+        if (this._isParsingConfig) return;
+
         const event = new CustomEvent('configchange', {
             detail: {
                 objectName: this.selectedObject,
