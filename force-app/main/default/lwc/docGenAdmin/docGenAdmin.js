@@ -235,8 +235,9 @@ const VERSION_COLUMNS = [
         this.editTemplateQuery = event.detail.queryConfig;
     }
     
-    handleEditTestRecordChange(event) { 
-        this.editTemplateTestRecordId = event.detail.recordId; 
+    handleEditTestRecordChange(event) {
+        const selectedId = event?.detail?.recordId || event?.detail?.value || event?.target?.value || null;
+        this.editTemplateTestRecordId = selectedId;
     }
 
     handleTitleFormatChange(event) {
@@ -540,7 +541,7 @@ const VERSION_COLUMNS = [
 
     // --- Document Generation & Test Logic ---
     get editTemplateTestRecordIdEmpty() {
-        return !this.editTemplateTestRecordId;
+        return !String(this.editTemplateTestRecordId || '').trim();
     }
 
     async handleTestGenerate() {
